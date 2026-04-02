@@ -30,3 +30,11 @@ backend/
 ## 🚀 Current Endpoints
 
 ### Health Check
+Response:
+
+```json
+{
+  "status": "ok",
+  "message": "TIPFLOW API working"
+}
+
