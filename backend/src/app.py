@@ -10,12 +10,11 @@ app.config.from_object(Config)
 db.init_app(app)
 
 with app.app_context():
+    # ⚠️ CRÍTICO: importar modelos ANTES de create_all()
+    from src.models import User, Restaurant, Shift, ShiftEmployee
     db.create_all()
+    print("✅ Tablas creadas")
 
-app.register_blueprint(health_bp)
-app.register_blueprint(auth_bp)
-
-
-@app.route("/")
-def home():
-    return {"message": "TIPFLOW API is running 🚀"}
+# blueprints con prefix correcto
+app.register_blueprint(health_bp, url_prefix="/api")
+app.register_blueprint(auth_bp, url_prefix="/api/auth")

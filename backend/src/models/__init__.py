@@ -1,4 +1,3 @@
-# models/__init__.py
 from .user import User
 from .restaurant import Restaurant
 from .shift import Shift
