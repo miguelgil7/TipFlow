@@ -3,11 +3,13 @@ from src.config import Config
 from src.db import db
 from src.routes.health import health_bp
 from src.routes.auth import auth_bp
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
+JWTManager(app)
 
 with app.app_context():
     # ⚠️ CRÍTICO: importar modelos ANTES de create_all()
