@@ -4,8 +4,13 @@ from src.db import db
 from src.routes.health import health_bp
 from src.routes.auth import auth_bp
 from src.routes.shifts import shifts_bp
+from src.routes.ai import ai_bp
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -21,3 +26,4 @@ with app.app_context():
 app.register_blueprint(health_bp, url_prefix="/api")
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(shifts_bp, url_prefix="/api/shifts")
+app.register_blueprint(ai_bp, url_prefix="/api/ai")
