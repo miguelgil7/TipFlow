@@ -8,15 +8,12 @@ from datetime import date
 
 shifts_bp = Blueprint("shifts", __name__)
 
-# GET /api/shifts — listar todos los shifts
 @shifts_bp.route("/", methods=["GET"])
 @jwt_required()
 def get_shifts():
     shifts = Shift.query.all()
     return {"shifts": [s.serialize() for s in shifts]}, 200
 
-
-# POST /api/shifts — crear nuevo shift
 @shifts_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_shift():
@@ -26,8 +23,12 @@ def create_shift():
     if not data.get("total_tips") or not data.get("restaurant_id"):
         return {"error": "total_tips and restaurant_id are required"}, 400
 
+    # convertir el string "2026-04-01" a objeto date de Python
+    shift_date_str = data.get("shift_date", date.today().isoformat())
+    shift_date_obj = date.fromisoformat(shift_date_str)
+
     shift = Shift(
-        shift_date=date.today(),
+        shift_date=shift_date_obj,
         total_tips=data["total_tips"],
         restaurant_id=data["restaurant_id"],
         created_by=user_id
@@ -37,8 +38,6 @@ def create_shift():
 
     return {"message": "Shift created", "shift": shift.serialize()}, 201
 
-
-# POST /api/shifts/:id/employees — agregar empleado al shift
 @shifts_bp.route("/<int:shift_id>/employees", methods=["POST"])
 @jwt_required()
 def add_employee(shift_id):
@@ -58,8 +57,6 @@ def add_employee(shift_id):
 
     return {"message": "Employee added", "employee": employee.serialize()}, 201
 
-
-# POST /api/shifts/:id/calculate — calcular propinas
 @shifts_bp.route("/<int:shift_id>/calculate", methods=["POST"])
 @jwt_required()
 def calculate(shift_id):
