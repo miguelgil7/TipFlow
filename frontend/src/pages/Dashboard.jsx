@@ -8,17 +8,21 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [shifts, setShifts] = useState([]);
   const [totalHoy, setTotalHoy] = useState(0);
+  const [aiInsight, setAiInsight] = useState(null);
 
   useEffect(() => {
     API.get("/shifts/").then((res) => {
       const data = res.data.shifts;
       setShifts(data);
-      // sumar tips del día de hoy
       const hoy = new Date().toISOString().split("T")[0];
       const hoyTotal = data
         .filter((s) => s.shift_date === hoy)
         .reduce((acc, s) => acc + s.total_tips, 0);
       setTotalHoy(hoyTotal);
+    });
+
+    API.get("/ai/insights").then((res) => {
+      setAiInsight(res.data);
     });
   }, []);
 
@@ -29,7 +33,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto", padding: "32px 20px" }}>
-      
+
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
         <div>
@@ -38,9 +42,7 @@ export default function Dashboard() {
             Hola, {user?.name}
           </p>
         </div>
-        <button onClick={handleLogout} style={{ fontSize: "13px" }}>
-          Salir
-        </button>
+        <button onClick={handleLogout} style={{ fontSize: "13px" }}>Salir</button>
       </div>
 
       {/* Stats */}
@@ -65,6 +67,41 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* AI Insight */}
+      {aiInsight && (
+        <div style={{
+          background: "var(--color-background-secondary)",
+          border: "1px solid #EF9F27",
+          borderRadius: "12px",
+          padding: "16px",
+          marginBottom: "24px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <span style={{ fontSize: "16px" }}>✦</span>
+            <span style={{ fontSize: "13px", fontWeight: "500", color: "#EF9F27" }}>Tu análisis IA</span>
+          </div>
+          <p style={{ fontSize: "13px", color: "var(--color-text-primary)", lineHeight: "1.7", margin: 0 }}>
+            {aiInsight.insight}
+          </p>
+          {aiInsight.stats && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 12 }}>
+              <div style={{ background: "var(--color-background-tertiary)", borderRadius: 6, padding: "8px 10px" }}>
+                <p style={{ fontSize: "10px", color: "var(--color-text-secondary)", margin: "0 0 2px" }}>Promedio/hora</p>
+                <p style={{ fontSize: "15px", fontWeight: "500", color: "#EF9F27", margin: 0 }}>
+                  ${aiInsight.stats.promedio_por_hora}
+                </p>
+              </div>
+              <div style={{ background: "var(--color-background-tertiary)", borderRadius: 6, padding: "8px 10px" }}>
+                <p style={{ fontSize: "10px", color: "var(--color-text-secondary)", margin: "0 0 2px" }}>Total ganado</p>
+                <p style={{ fontSize: "15px", fontWeight: "500", color: "#639922", margin: 0 }}>
+                  ${aiInsight.stats.total_ganado}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Botón nuevo turno */}
       <button
         onClick={() => navigate("/nuevo-turno")}
@@ -82,14 +119,11 @@ export default function Dashboard() {
           </p>
         ) : (
           shifts.slice().reverse().map((shift) => (
-            <div
-              key={shift.id}
-              style={{
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                padding: "12px", background: "var(--color-background-secondary)",
-                borderRadius: "8px", marginBottom: "8px"
-              }}
-            >
+            <div key={shift.id} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              padding: "12px", background: "var(--color-background-secondary)",
+              borderRadius: "8px", marginBottom: "8px"
+            }}>
               <div>
                 <p style={{ fontSize: "13px", fontWeight: "500", margin: 0 }}>{shift.shift_date}</p>
                 <p style={{ fontSize: "11px", color: "var(--color-text-secondary)", margin: "2px 0 0" }}>
