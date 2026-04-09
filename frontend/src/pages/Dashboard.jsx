@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import API from "../services/api";
 
 export default function Dashboard() {
@@ -81,7 +82,7 @@ export default function Dashboard() {
             <span style={{ fontSize: "13px", fontWeight: "500", color: "#EF9F27" }}>Tu análisis IA</span>
           </div>
           <p style={{ fontSize: "13px", color: "var(--color-text-primary)", lineHeight: "1.7", margin: 0 }}>
-            {aiInsight.insight}
+            <ReactMarkdown>{aiInsight.insight}</ReactMarkdown>
           </p>
           {aiInsight.stats && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 12 }}>
@@ -127,7 +128,7 @@ export default function Dashboard() {
               <div>
                 <p style={{ fontSize: "13px", fontWeight: "500", margin: 0 }}>{shift.shift_date}</p>
                 <p style={{ fontSize: "11px", color: "var(--color-text-secondary)", margin: "2px 0 0" }}>
-                  {shift.status}
+                  {shift.status === "calculated" ? "✓ Completado" : shift.status === "draft" ? "Borrador" : shift.status}
                 </p>
               </div>
               <p style={{ fontSize: "16px", fontWeight: "500", color: "#639922", margin: 0 }}>
