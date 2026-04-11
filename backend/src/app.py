@@ -6,6 +6,7 @@ from src.routes.auth import auth_bp
 from src.routes.shifts import shifts_bp
 from src.routes.ai import ai_bp
 from src.routes.stats import stats_bp
+from src.routes.onboarding import onboarding_bp
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_limiter import Limiter
@@ -39,6 +40,7 @@ app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(shifts_bp, url_prefix="/api/shifts")
 app.register_blueprint(ai_bp, url_prefix="/api/ai")
 app.register_blueprint(stats_bp, url_prefix="/api/stats")
+app.register_blueprint(onboarding_bp, url_prefix="/api/onboarding")
 
 # manejo global de errores
 @app.errorhandler(429)

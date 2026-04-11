@@ -8,11 +8,14 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(50), default="employee")
-    restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurants.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # rates por día (0=lunes ... 6=domingo)
+    # Onboarding
+    role = db.Column(db.String(50), default="server")
+    workplace = db.Column(db.String(100), nullable=True)
+    onboarding_complete = db.Column(db.Boolean, default=False)
+
+    # Rates por día
     rate_monday = db.Column(db.Float, default=10.98)
     rate_tuesday = db.Column(db.Float, default=10.98)
     rate_wednesday = db.Column(db.Float, default=10.98)
@@ -20,6 +23,15 @@ class User(db.Model):
     rate_friday = db.Column(db.Float, default=10.98)
     rate_saturday = db.Column(db.Float, default=10.98)
     rate_sunday = db.Column(db.Float, default=14.00)
+
+    # Tips config
+    separate_cash_credit = db.Column(db.Boolean, default=False)
+    tipout_type = db.Column(db.String(20), default="none")  # none, fixed, percentage
+    tipout_value = db.Column(db.Float, default=0.0)
+
+    # Días que trabaja (ej: "1,2,3,4,5" = lun-vie)
+    work_days = db.Column(db.String(20), default="1,2,3,4,5")
+    restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurants.id"), nullable=True)
 
     def get_rate_for_date(self, date):
         rates = [
@@ -35,8 +47,13 @@ class User(db.Model):
             "name": self.name,
             "email": self.email,
             "role": self.role,
+            "workplace": self.workplace,
+            "onboarding_complete": self.onboarding_complete,
             "restaurant_id": self.restaurant_id,
-            "created_at": self.created_at.isoformat(),
+            "separate_cash_credit": self.separate_cash_credit,
+            "tipout_type": self.tipout_type,
+            "tipout_value": self.tipout_value,
+            "work_days": self.work_days,
             "rates": {
                 "monday": self.rate_monday,
                 "tuesday": self.rate_tuesday,
