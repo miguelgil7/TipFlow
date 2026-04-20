@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 from src.config import Config
 from src.db import db
 from src.routes.health import health_bp
@@ -17,11 +17,16 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
 db.init_app(app)
 JWTManager(app)
-CORS(app)
 
-# Rate limiting — protege contra abuso
+CORS(
+    app,
+    resources={r"/api/*": {"origins": [app.config["FRONTEND_URL"]]}},
+    supports_credentials=False
+)
+
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -34,7 +39,6 @@ with app.app_context():
     db.create_all()
     print("✅ Tablas creadas")
 
-# blueprints
 app.register_blueprint(health_bp, url_prefix="/api")
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(shifts_bp, url_prefix="/api/shifts")
@@ -42,7 +46,6 @@ app.register_blueprint(ai_bp, url_prefix="/api/ai")
 app.register_blueprint(stats_bp, url_prefix="/api/stats")
 app.register_blueprint(onboarding_bp, url_prefix="/api/onboarding")
 
-# manejo global de errores
 @app.errorhandler(429)
 def ratelimit_handler(e):
     return jsonify({"error": "Demasiadas solicitudes. Intenta más tarde."}), 429
@@ -54,3 +57,6 @@ def not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return jsonify({"error": "Error interno del servidor"}), 500
+
+if __name__ == "__main__":
+    app.run(debug=app.config["FLASK_DEBUG"])
